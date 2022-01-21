@@ -21,7 +21,7 @@ pipeline {
              steps {
                  script {
                      sh """
-                        git checkout origin master
+                        git checkout origin main
                         git fetch --tags --force
                         git tag --sort=committerdate | grep -E '^v[0-9]' | tail -1
                     """
