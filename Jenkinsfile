@@ -21,7 +21,6 @@ pipeline {
              steps {
                  script {
                      sh """
-                        mkdir -p ~/.ssh && cp ${keyfile} ~/.ssh/id_rsa
                         git checkout origin master
                         git fetch --tags --force
                         git tag --sort=committerdate | grep -E '^v[0-9]' | tail -1
@@ -56,7 +55,6 @@ pipeline {
                     echo "we will tag '${result}'"
 
                      sh """
-                        mkdir -p ~/.ssh && cp ${keyfile} ~/.ssh/id_rsa
                         git config user.email "jenkins@rgare.com"
                         git config user.name "jenkins"
                         git tag -a "${result}" -m "Release of version ${result}"
