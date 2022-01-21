@@ -1,5 +1,10 @@
 #!groovy
 
+import groovy.json.JsonOutput
+import java.util.Optional
+import hudson.tasks.test.AbstractTestResultAction
+import hudson.model.Actionable
+import hudson.tasks.junit.CaseResult
 
 pipeline {
 
@@ -21,18 +26,16 @@ pipeline {
             }
         }
 
-    post {
-        success {
-            script {
-
-                sh """
+        stage('Deploy Config') {
+             steps {
+                 script {
+                     sh """
                         mkdir -p ~/.ssh && cp ${keyfile} ~/.ssh/id_rsa
                         git checkout origin master
                         git fetch --tags --force
                         git tag --sort=committerdate | grep -E '^v[0-9]' | tail -1
                     """
-                }
-                sh """ 
+                     sh """ 
                     version=\$(git tag --sort=committerdate | grep -E '^v[0-9]' | tail -1)
                     #Version to get the latest tag 
                     A="\$(echo \$version|cut -d '.' -f1)"
@@ -56,13 +59,12 @@ pipeline {
                     echo "A[\$A.\$B.\$C]">outFile
 
                     """
-                    nextVersion = readFile 'outFile'
+                     nextVersion = readFile 'outFile'
                     echo "we will tag '${nextVersion}'"
                     result = nextVersion.substring(nextVersion.indexOf("[")+1,nextVersion.indexOf("]"))
                     echo "we will tag '${result}'"
 
-
-                    sh """
+                     sh """
                         mkdir -p ~/.ssh && cp ${keyfile} ~/.ssh/id_rsa
                         git config user.email "jenkins@rgare.com"
                         git config user.name "jenkins"
@@ -70,7 +72,8 @@ pipeline {
                         git push origin "${result}"
                     """
                 }
-
+             }
         }
     }
+
 }
